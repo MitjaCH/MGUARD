@@ -3,11 +3,11 @@ import mysql.connector
 def on_connect():
     try:
         db_config = {
-            'host': 'host',
-            'port': 'port',
-            'user': 'username',
-            'password': 'user_password',
-            'database': 'database_name'
+            'host': '#',
+            'port': '#',
+            'user': '#',
+            'password': '#',
+            'database': '#'
         }
 
         connection = mysql.connector.connect(**db_config)
@@ -20,3 +20,43 @@ def on_connect():
     except mysql.connector.Error as error:
         print("Error connecting to MySQL database:", error)
         return None
+
+def load_users():
+    connection = on_connect()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("SELECT name FROM user")
+            users = cursor.fetchall()
+            return [user[0] for user in users]
+
+        except mysql.connector.Error as error:
+            print("Error loading users:", error)
+
+        finally:
+            connection.close()
+
+    return []
+
+
+
+def register_user(username, password, email):
+    connection = on_connect()
+    if connection:
+        try:
+            cursor = connection.cursor()
+
+            query = "INSERT INTO user (name, password, email) VALUES (%s, %s, %s)"
+            values = (username, password, email)
+
+            cursor.execute(query, values)
+            connection.commit()
+
+            print("User registered successfully.")
+
+        except mysql.connector.Error as error:
+            print("Error registering user:", error)
+            connection.rollback()
+
+        finally:
+            connection.close()

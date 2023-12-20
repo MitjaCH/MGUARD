@@ -23,6 +23,7 @@ class Login:
 
         self.username_var = StringVar()
         self.password_var = StringVar()
+        self.email_var = StringVar()
 
         self.canvas = tk.Canvas(self.window, bg="#383838", height=500, width=800, bd=0, highlightthickness=0, relief="ridge")
         self.canvas.place(x=0, y=0)
@@ -54,58 +55,64 @@ class Login:
         self.window.mainloop()
 
     def load_users(self):
-        print("Loaded Users")
+        user = db_conn.load_users()
+        print("Loaded Users:", user)
 
     def login(self):
         print("Login!")
 
     def open_register(self):
-        print("Opened Register")
+        self.window.destroy()
+        Register(self.window)
 
     def open_manager(self):
         print("Opened Manager")
 
 
+
 class Register:
-    def __init__(self):
+    def __init__(self, login_window):
         self.window = tk.Tk()
         self.window.geometry("800x500")
         self.window.configure(bg="#383838")
 
+        self.login_window = login_window
         self.key = self.load_key()
+        self.load_users()
+        
         self.fonts = Fonts()
         
         self.username_var = StringVar()
         self.password_var = StringVar()
         self.email_var = StringVar()
         
-        self.canvas = tk.Canvas(self.frame, bg="#383838", height=500, width=800, bd=0, highlightthickness=0, relief="ridge")
+        self.canvas = tk.Canvas(self.window, bg="#383838", height=500, width=800, bd=0, highlightthickness=0, relief="ridge")
         self.canvas.place(x=0, y=0)
         self.canvas.create_rectangle(0.0, 0.0, 800.0, 77.0, fill="#FF4B4B", outline="")
-        self.canvas.create_text(260.0, 16.0, anchor="nw", text="Registrierung", fill="#FFFFFF", font=self.titleFont)
+        self.canvas.create_text(260.0, 16.0, anchor="nw", text="Registrierung", fill="#FFFFFF", font=self.fonts.titleFont)
         
         self.email_entry = tk.Entry(bd=0, bg="#FF4B4B", fg="#ffffff", highlightthickness=0, textvariable=self.email_var)
         self.email_entry.place(x=248.0, y=118.0, width=304.0, height=75.0)
 
-        self.email_label = tk.Label(text="E-Mail", bd=0,bg="#FF4B4B", fg="#ffffff", highlightthickness=0, font=self.entryTitle)
+        self.email_label = tk.Label(text="E-Mail", bd=0,bg="#FF4B4B", fg="#ffffff", highlightthickness=0, font=self.fonts.entryTitle)
         self.email_label.place(x=248.0, y=118.0, width=50.0, height=25.0)
 
         self.username_entry = tk.Entry(bd=0, bg="#FF4B4B", fg="#ffffff", highlightthickness=0, textvariable=self.username_var)
         self.username_entry.place(x=248.0, y=218.0, width=304.0, height=75.0)
 
-        self.username_label = tk.Label(text="Username", bd=0,bg="#FF4B4B", fg="#ffffff", highlightthickness=0, font=self.entryTitle)
+        self.username_label = tk.Label(text="Username", bd=0,bg="#FF4B4B", fg="#ffffff", highlightthickness=0, font=self.fonts.entryTitle)
         self.username_label.place(x=248.0, y=218.0, width=70.0, height=25.0)
         
         self.password_entry = tk.Entry(bd=0, bg="#FF4B4B", fg="#ffffff", highlightthickness=0, textvariable=self.password_var)
         self.password_entry.place(x=248.0, y=318.0, width=304.0, height=75.0)
 
-        self.password_label = tk.Label(text="Password", bd=0,bg="#FF4B4B", fg="#ffffff", highlightthickness=0, font=self.entryTitle)
+        self.password_label = tk.Label(text="Password", bd=0,bg="#FF4B4B", fg="#ffffff", highlightthickness=0, font=self.fonts.entryTitle)
         self.password_label.place(x=248.0, y=318.0, width=70.0, height=25.0)
         
         self.error_Label = tk.Label(text="", fg="red", font=("Arial", 12), bg="#FF4B4B")
         self.error_Label.place(x=248.0, y=80.0, width=304.0, height=25.0)
         
-        self.registerBTN = tk.Button(borderwidth=0, highlightthickness=0, fg="#ffffff", bg="#FF4B4B", text="Registrieren", command=self.register, relief="flat")
+        self.registerBTN = tk.Button(borderwidth=0, highlightthickness=0, fg="#ffffff", bg="#FF4B4B", text="Registrieren", command=self.register_user_wrapper, relief="flat")
         self.registerBTN.place(x=310.0, y=404.0, width=179.0, height=49.0)
         
         self.login = tk.Button(text="Zurück zur Anmeldung", fg="#ffffff", bg="#FF4B4B", borderwidth=0, highlightthickness=0, command=self.open_login)
@@ -114,17 +121,24 @@ class Register:
         self.window.resizable(False, False)
         self.window.mainloop()
 
-
     def load_key(self):
         print("Loaded Key")
 
-    def register(self):
-        print("Registered.")
-
-
 
     def open_login(self):
-        print("Opened Login")
+        self.window.destroy()
+        Login(self.window)
+
+    def load_users(self):
+        user = db_conn.load_users()
+        print("Loaded Users:", user)
+
+    def register_user_wrapper(self, event=None):
+        username = self.username_var.get()
+        password = self.password_var.get()
+        email = self.email_var.get()
+
+        db_conn.register_user(username, password, email)
 
 
 if __name__ == "__main__":
