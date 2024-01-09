@@ -59,11 +59,30 @@ class Login:
         print("Loaded Users:", user)
 
     def login(self):
-        print("Login!")
+          username = self.username_var.get()
+          password = self.password_var.get()
+
+          users = db_conn.load_users()
+          if username in users:
+              stored_password = db_conn.get_password(username)
+
+              if stored_password == password:
+                  print("Login successful!")
+                  self.open_manager()
+              else:
+                  print("Invalid password")
+                  self.display_error("Invalid password. Please try again.")
+          else:
+              print("Invalid username")
+              self.display_error("Invalid username. Please try again.")
+
+    def display_error(self, message):
+        self.errorLabel.config(text=message)
+        self.errorLabel.place(x=248.0, y=95.0, width=304.0, height=71.0)
 
     def open_register(self):
-        self.window.destroy()
-        Register(self.window)
+      self.window.destroy()
+      Register(self.window)
 
     def open_manager(self):
         print("Opened Manager")
@@ -140,6 +159,31 @@ class Register:
 
         db_conn.register_user(username, password, email)
 
+class Vault:
+    def __init__(self):
+        self.window = tk.Tk()    
+        self.window.geometry("1080x600")
+        self.window.configure(bg = "#FFFFFF")
+
+        self.fonts = Fonts()
+
+        self.canvas = tk.Canvas(self.window,bg = "#FFFFFF",height = 600,width = 1080,bd = 0,highlightthickness = 0,relief = "ridge")
+
+        self.canvas.place(x = 0, y = 0)
+        self.canvas.create_rectangle(0.0,0.0,1080.0,600.0,fill="#393939",outline="")
+        self.canvas.create_rectangle(0.0,0.0,1080.0,77.0,fill="#0075FF",outline="")
+        self.canvas.create_text(852.0,9.0,anchor="nw",text="MGUARD",fill="#FFFFFF",font=self.fonts.titleFont)
+        self.canvas.create_rectangle(0.0,77.0,269.0,600.0,fill="#494949",outline="")
+
+        self.userDropDownBTN = tk.Button(borderwidth=0,highlightthickness=0, fg="#ffffff", bg="#3994FF",command=lambda: print("button_1 clicked"),relief="flat")
+        self.userDropDownBTN.place(x=7.0,y=9.0,width=257.0,height=58.0)
+
+        # Template Button For Credential Bar Thingy :)
+        # self.button_2 = tk.Button(borderwidth=0,highlightthickness=0,command=lambda: print("button_2 clicked"),relief="flat")
+        # self.button_2.place(x=7.0,y=85.0,width=257.0,height=62.0)
+
+        self.window.resizable(False, False)
+        self.window.mainloop()
 
 if __name__ == "__main__":
     Login()

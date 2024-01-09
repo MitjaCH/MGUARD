@@ -3,11 +3,11 @@ import mysql.connector
 def on_connect():
     try:
         db_config = {
-            'host': '#',
-            'port': '#',
-            'user': '#',
-            'password': '#',
-            'database': '#'
+            'host': '-',
+            'port': '-',
+            'user': '-',
+            'password': '-',
+            'database': '-'
         }
 
         connection = mysql.connector.connect(**db_config)
@@ -60,3 +60,19 @@ def register_user(username, password, email):
 
         finally:
             connection.close()
+
+def get_password(username):
+    connection = on_connect()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            query = "SELECT password FROM user WHERE name = %s"
+            cursor.execute(query, (username,))
+            result = cursor.fetchone()
+            if result:
+                return result[0]  # Returning the stored password
+        except mysql.connector.Error as error:
+            print("Error fetching password:", error)
+        finally:
+            connection.close()
+    return None
